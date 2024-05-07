@@ -25,7 +25,15 @@ class Task(ABC):
         self.stop_words = stop_words
         self.requires_execution = requires_execution
         try:
-            self.dataset = load_dataset(path=self.DATASET_PATH, name=self.DATASET_NAME)
+            # TODO: This is a hacky hard-coded way I'm modifying this to work with the LE dataset
+            if self.DATASET_PATH == "mbpp_le":
+                data_files = {
+                    "train": "evaluation/mbpp_le/train/data-00000-of-00001.arrow",
+                    "minibatch": "evaluation/mbpp_le/minibatch/data-00000-of-00001.arrow"
+                }
+                self.dataset = load_dataset("arrow", data_files=data_files)
+            else:
+                self.dataset = load_dataset(path=self.DATASET_PATH, name=self.DATASET_NAME)
         except Exception as e:
             warn(
                 f"Loading the dataset failed with {str(e)}. This task will use a locally downloaded dataset, not from the HF hub. \
